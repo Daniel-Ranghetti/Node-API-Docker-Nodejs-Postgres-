@@ -26,55 +26,38 @@ const verifyToken = (req, res, next) => {
 };
  
 const isAdmin = async (req, res, next) => {
-    try {
-        const user = await User.findByPk(req.userId);
-        const roles = await user.getRoles();
- 
-        for (const role of roles) {
-            if (role.name === "admin") {
-                return next();
-            }
-        }
- 
-        return res.status(403).json({ message: "Require Admin Role!" });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+  try {
+    const user = await User.findByPk(req.userId);
+    if (user.role === "admin") {
+      return next();
     }
+    return res.status(403).json({ message: "Require Admin Role!" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
+
  
 const isModerator = async (req, res, next) => {
-    try {
-        const user = await User.findByPk(req.userId);
-        const roles = await user.getRoles();
- 
-        for (const role of roles) {
-            if (role.name === "moderator") {
-                return next();
-            }
-        }
- 
-        return res.status(403).json({ message: "Require Moderator Role!" });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+  try {
+    const user = await User.findByPk(req.userId);
+    if (user.role === "moderator") return next();
+    return res.status(403).json({ message: "Require Moderator Role!" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
- 
+
 const isModeratorOrAdmin = async (req, res, next) => {
-    try {
-        const user = await User.findByPk(req.userId);
-        const roles = await user.getRoles();
- 
-        for (const role of roles) {
-            if (role.name === "moderator" || role.name === "admin") {
-                return next();
-            }
-        }
- 
-        return res.status(403).json({ message: "Require Moderator or Admin Role!" });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+  try {
+    const user = await User.findByPk(req.userId);
+    if (user.role === "moderator" || user.role === "admin") return next();
+    return res.status(403).json({ message: "Require Moderator or Admin Role!" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
+
  
 const authJwt = {
     verifyToken,

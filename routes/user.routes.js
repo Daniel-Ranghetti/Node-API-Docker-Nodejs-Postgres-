@@ -7,19 +7,23 @@ import {
     adminBoard,
 } from "../controllers/user.controller.js";
 import { authJwt } from "../middlewares/index.js";
+import * as authController from "../controllers/auth.controller.js";
  
 const router = express.Router();
  
-// Public Route
+// Rotas de acesso padrão
 router.get("/all", allAccess);
- 
-// User Route
 router.get("/user", [authJwt.verifyToken], userBoard);
- 
-// Moderator Route
-router.get("/mod", [authJwt.verifyToken, authJwt.isModerator], moderatorBoard);
- 
-// Admin Route
+router.get("/mod", [authJwt.verifyToken, authJwt.isModeratorOrAdmin], moderatorBoard);
 router.get("/admin", [authJwt.verifyToken, authJwt.isAdmin], adminBoard);
+
+// CRUD de usuários
+router.get("/users", [authJwt.verifyToken], authController.getUsers);
+router.get("/users/:userId", [authJwt.verifyToken], authController.getUser);
+router.put("/users/:userId", [authJwt.verifyToken], authController.updateUser);
+router.delete("/users/:userId", [authJwt.verifyToken], authController.deleteUser);
+router.post("/signup", authController.signup);
+router.post("/signin", authController.signin);
+
  
 export default router;
