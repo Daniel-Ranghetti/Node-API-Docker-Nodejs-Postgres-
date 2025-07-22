@@ -77,18 +77,27 @@ export const updateUser = async (req, res) => {
 };
 
 
-
 // DELETE user
 export const deleteUser = async (req, res) => {
   try {
-    const user = await User.findByPk(req.params.userId);
-    if (!user) return res.status(404).json({ message: 'User not found!' });
-    await user.destroy();
+    const user = await User.findByPk(req.userId); // usuário do token
+    const targetUser = await User.findByPk(req.params.userId); // usuário que será deletado
+
+    if (!targetUser) return res.status(404).json({ message: 'User not found!' });
+
+    // Só o admin ou o próprio usuário podem deletar
+    if (user.role !== 'admin' && user.id !== targetUser.id) {
+      return res.status(403).json({ message: 'Unauthorized to delete this user' });
+    }
+
+    await targetUser.destroy();
+
     res.status(200).json({ message: 'User deleted!' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 // SIGNIN user
 export const signin = async (req, res) => {
